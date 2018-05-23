@@ -2,21 +2,34 @@
 
 const fs = require('fs')
 
+const endsWith = ext => string => {
+	const pos = string.indexOf(ext)
+	return pos > 0 && pos === string.length - ext.length
+}
+
 const walkSync = (directory, opts) => {
   const files = fs.readdirSync(directory)
 
   return files.reduce((fileList, file) => {
+  	if (opts.blacklistedFolders.length && opts.blacklistedFolders.some(folder => folder === file)) {
+  		return fileList
+  	}
+
+  	if (opts.whitelistedFolders.length && !opts.whitelistedFolders.find(folder => folder === file)) {
+  		return fileList
+  	}
+
   	const fullPath = `${directory}/${file}`
 
     if (fs.statSync(fullPath).isDirectory()) {
       return fileList.concat(walkSync(fullPath, opts))
     }
 
-  	if (opts.blacklistedExt.some(ext => file.indexOf(ext) > -1)) {
+  	if (opts.blacklistedExt.length && opts.blacklistedExt.some(ext => endsWith(ext, file))) {
   		return fileList
   	}
 
-  	if (!opts.whitelistedExt.find(ext => file.indexOf(ext) > -1)) {
+  	if (opts.whitelistedExt.length && !opts.whitelistedExt.find(ext => endsWith(ext, file))) {
   		return fileList
   	}
 
@@ -25,7 +38,16 @@ const walkSync = (directory, opts) => {
 }
 
 module.exports = function main({ directory, opts, modifyFn }) {
-	const fileList = walkSync(directory, opts)
+	const fileList = walkSync(
+		directory,
+		{
+			whitelistedExt: [],
+			blacklistedExt: [],
+			whitelistedFolders: [],
+			blacklistedFolders: [],
+			...opts,
+		},
+	)
 
 	fileList.forEach(filepath => {
 		const contents = fs.readFileSync(filepath, 'utf8')
@@ -35,6 +57,6 @@ module.exports = function main({ directory, opts, modifyFn }) {
 			return
 		}
 
-		fs.writeFileSync(updatedContents, 'utf8')
+		fs.writeFileSync(filepath, updatedContents, 'utf8')
 	})
 }
