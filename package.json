@@ -1,0 +1,9 @@
+{
+  "name": "file-modifier",
+  "version": "1.0.0",
+  "description": "Provide easy mechanism for reading files recursively from a directory and applying a change",
+  "main": "src/index.js",
+  "keywords": [],
+  "author": "Joseph Bowler",
+  "license": "ISC"
+}
