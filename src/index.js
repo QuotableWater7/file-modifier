@@ -14,14 +14,14 @@ const walkSync = (directory, opts) => {
 		const fullPath = `${directory}/${file}`
 
 		if (fs.statSync(fullPath).isDirectory()) {
-			if (opts.blacklistedFolders.length && opts.blacklistedFolders.some(folder => folder === file)) {
+			if (opts.blacklistedFolders.some(folder => folder === file)) {
 				return fileList
 			}
 
 			return fileList.concat(walkSync(fullPath, opts))
 		}
 
-		if (opts.blacklistedExt.length && opts.blacklistedExt.some(endsString(fullPath))) {
+		if (opts.blacklistedExt.some(endsString(fullPath))) {
 			return fileList
 		}
 
