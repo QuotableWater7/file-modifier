@@ -8,33 +8,33 @@ const endsWith = ext => string => {
 }
 
 const walkSync = (directory, opts) => {
-  const files = fs.readdirSync(directory)
+	const files = fs.readdirSync(directory)
 
-  return files.reduce((fileList, file) => {
-  	if (opts.blacklistedFolders.length && opts.blacklistedFolders.some(folder => folder === file)) {
-  		return fileList
-  	}
+	return files.reduce((fileList, file) => {
+		if (opts.blacklistedFolders.length && opts.blacklistedFolders.some(folder => folder === file)) {
+			return fileList
+		}
 
-  	if (opts.whitelistedFolders.length && !opts.whitelistedFolders.find(folder => folder === file)) {
-  		return fileList
-  	}
+		if (opts.whitelistedFolders.length && !opts.whitelistedFolders.find(folder => folder === file)) {
+			return fileList
+		}
 
-  	const fullPath = `${directory}/${file}`
+		const fullPath = `${directory}/${file}`
 
-    if (fs.statSync(fullPath).isDirectory()) {
-      return fileList.concat(walkSync(fullPath, opts))
-    }
+		if (fs.statSync(fullPath).isDirectory()) {
+			return fileList.concat(walkSync(fullPath, opts))
+		}
 
-  	if (opts.blacklistedExt.length && opts.blacklistedExt.some(ext => endsWith(ext, file))) {
-  		return fileList
-  	}
+		if (opts.blacklistedExt.length && opts.blacklistedExt.some(ext => endsWith(ext, file))) {
+			return fileList
+		}
 
-  	if (opts.whitelistedExt.length && !opts.whitelistedExt.find(ext => endsWith(ext, file))) {
-  		return fileList
-  	}
+		if (opts.whitelistedExt.length && !opts.whitelistedExt.find(ext => endsWith(ext, file))) {
+			return fileList
+		}
 
-    return fileList.concat([fullPath])
-  }, [])
+		return fileList.concat([fullPath])
+	}, [])
 }
 
 module.exports = function main({ directory, opts, modifyFn }) {
@@ -53,7 +53,7 @@ module.exports = function main({ directory, opts, modifyFn }) {
 		const contents = fs.readFileSync(filepath, 'utf8')
 		const updatedContents = modifyFn(contents)
 
-		if (contents === updatedContents) {
+		if (contents === updatedContents || updatedContents === undefined) {
 			return
 		}
 
