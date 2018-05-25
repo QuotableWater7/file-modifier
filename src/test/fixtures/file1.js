@@ -1,1 +1,1 @@
-boring change
+module.exports = 'just a string'

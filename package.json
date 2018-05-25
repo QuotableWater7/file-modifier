@@ -1,6 +1,6 @@
 {
   "name": "file-modifier",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Provide easy mechanism for reading files recursively from a directory and applying a change",
   "main": "src/index.js",
   "scripts": {

@@ -1,1 +1,3 @@
-boring change
+module.exports = function blah() {
+	return 'blah'
+}

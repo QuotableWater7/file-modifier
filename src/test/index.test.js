@@ -3,28 +3,32 @@ const fs = require('fs')
 const fileModifier = require('..')
 
 const modifyThenRestore = (modifyParams) => {
-	const changedFilepaths = []
+	const checkedFiles = []
 
 	fileModifier({
 		...modifyParams,
 		modifyFn: (contents, { filepath }) => {
-			changedFilepaths.push(filepath)
+			checkedFiles.push({ filepath, contents })
 
 			return modifyParams.modifyFn(...arguments)
 		},
 	})
 
 	// save the current state of the fixtures
-	const changeDatas = changedFilepaths.map(filepath => {
+	const changeDatas = checkedFiles.map(({ filepath, contents }) => {
+		const newContents = fs.readFileSync(filepath, 'utf8')
+
 		return {
 			filepath,
-			contents: fs.readFileSync(filepath, 'utf8')
+			contents: fs.readFileSync(filepath, 'utf8'),
+			oldContents: contents,
 		}
 	})
+		.filter(({ contents, oldContents }) => contents !== oldContents)
 
 	// now revert the changes to the fixtures
-	changeDatas.forEach(({ contents, filepath }) => {
-		fs.writeFileSync(filepath, contents, 'utf8')
+	changeDatas.forEach(({ oldContents, filepath }) => {
+		fs.writeFileSync(filepath, oldContents, 'utf8')
 	})
 
 	return changeDatas
@@ -110,4 +114,13 @@ it('can blacklist specific subdirectories', async () => {
 		expect(filepath.indexOf('nested')).toBe(-1)
 		expect(contents).toBe('boring change')
 	})
+})
+
+it('does not change file if "undefined" is returned from modifyFn', async () => {
+	const changes = modifyThenRestore({
+		directory: __dirname + '/fixtures',
+		modifyFn: () => {},
+	})
+
+	expect(changes.length).toBe(0)
 })
