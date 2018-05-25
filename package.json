@@ -1,9 +1,15 @@
 {
   "name": "file-modifier",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Provide easy mechanism for reading files recursively from a directory and applying a change",
   "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
   "keywords": [],
   "author": "Joseph Bowler",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^23.0.0"
+  }
 }
